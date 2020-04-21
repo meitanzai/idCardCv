@@ -12,16 +12,23 @@ import org.bytedeco.javacpp.opencv_ml.ANN_MLP;
 import org.bytedeco.javacpp.indexer.FloatIndexer;
 import org.bytedeco.javacpp.indexer.IntIndexer;
 import org.opencv.ml.Ml;
+import org.springframework.util.ResourceUtils;
 
 import com.nbsl.cv.utils.CoreFunc;
 import com.nbsl.cv.utils.FileUtil;
 
 
-public class CHAR_ANN {
-    
-	public static String trainImages = "res/data/chars2";
-	public static String annXml = "res/model/ann.xml";
-
+public class CHAR_ANN {  
+	public static String trainImages;
+    public static String annXml;
+    static{
+    	try {
+    		trainImages= ResourceUtils.getFile("classpath:data/chars2").getAbsolutePath();
+    		annXml = ResourceUtils.getFile("classpath:model/ann.xml").getAbsolutePath();
+		} catch (Exception e) {
+			// TODO: handle exception
+		} 
+    } 
 	
     private ANN_MLP ann;
 

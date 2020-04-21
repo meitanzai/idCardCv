@@ -12,15 +12,23 @@ import org.bytedeco.javacpp.opencv_ml.SVM;
 import org.bytedeco.javacpp.indexer.FloatRawIndexer;
 import org.bytedeco.javacpp.indexer.IntIndexer;
 import org.opencv.ml.Ml;
+import org.springframework.util.ResourceUtils;
 
 import com.nbsl.cv.utils.CoreFunc;
 import com.nbsl.cv.utils.FileUtil;
   
-public class CHAR_SVM {  
+public class CHAR_SVM {   
     public static final int K = 5;  
-    
-	public static String trainImages = "data/chars2";
-	public static String svmXml = "res/model/svm.xml";
+    public static String trainImages;
+    public static String svmXml;
+    static{
+    	try {
+    		trainImages= ResourceUtils.getFile("classpath:data/chars2").getAbsolutePath();
+    		svmXml = ResourceUtils.getFile("classpath:model/svm.xml").getAbsolutePath();
+		} catch (Exception e) {
+			// TODO: handle exception
+		} 
+    } 
 
     private SVM svm =null;
 

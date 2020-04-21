@@ -10,15 +10,23 @@ import org.bytedeco.javacpp.opencv_imgcodecs;
 import org.bytedeco.javacpp.opencv_ml.KNearest;
 import org.bytedeco.javacpp.indexer.IntIndexer;
 import org.opencv.ml.Ml;
+import org.springframework.util.ResourceUtils;
 
 import com.nbsl.cv.utils.CoreFunc;
 import com.nbsl.cv.utils.FileUtil;
 
 public class CHAR_KNN {  
-    public static final int K = 5;  
-    
-	public static String trainImages = "res/data/chars2";
-
+    public static final int K = 5;   
+	public static String trainImages; 
+    static{
+    	try {
+    		trainImages= ResourceUtils.getFile("classpath:data/chars2").getAbsolutePath(); 
+		} catch (Exception e) {
+			// TODO: handle exception
+		} 
+    } 
+	
+	
     private KNearest knn ;
 
     private  int sizeData = 10;
