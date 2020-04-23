@@ -5,27 +5,112 @@ import static com.nbsl.cv.utils.OpencvUtil.shear;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.MatVector;
 import org.bytedeco.javacpp.opencv_core.Point2d;
+import org.bytedeco.javacpp.opencv_core.Rect;
 import org.bytedeco.javacpp.opencv_core.Scalar;
 import org.springframework.util.ResourceUtils;
 import org.bytedeco.javacpp.opencv_imgcodecs;
 import org.bytedeco.javacpp.opencv_imgproc;
 
+import com.nbsl.cv.utils.CoreFunc;
 import com.nbsl.cv.utils.OCRUtil;
 import com.nbsl.cv.utils.OpencvUtil;
 
 public class OrcTest {
 
     public static void main(String[] args) throws  Exception{
-        String path=ResourceUtils.getFile("classpath:test/xx1.jpg").getAbsolutePath();
+        String path=ResourceUtils.getFile("classpath:test/5.jpg").getAbsolutePath();
         Mat mat= opencv_imgcodecs.imread(path);
-        cardUp(mat);
+        idCard(mat);
         // card(mat);
     }
- 
+    /**
+     * 身份证正面识别
+     */
+    public static void idCard(Mat mat) throws  Exception{
+    	
+        Mat begin=mat.clone();
+        //截取身份证区域，并校正旋转角度
+        mat = OpencvUtil.houghLinesP(begin,mat);
+        
+        opencv_imgcodecs.imwrite("F:/face/houghLinesP.jpg", mat);
+        
+        //循环进行人脸识别,校正图片方向
+        Rect face=OpencvUtil.faceLocation(mat);
+       
+        //灰度
+     
+ 		mat = OpencvUtil.gray(mat); 
+ 		// 二值化 此处绝定图片的清晰度 
+ 		opencv_imgproc.adaptiveThreshold(mat, mat, 255, opencv_imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,
+ 				opencv_imgproc.THRESH_BINARY_INV, 25, 10);  
+ 		// 腐蚀  去除背景图片
+ 		mat = OpencvUtil.erode(mat, 1);  
+        //膨胀
+        //mat=OpencvUtil.dilate(mat,1); 
+       
+        //降噪
+     	//mat = OpencvUtil.navieRemoveNoise(mat, 1);  
+        //获取身份证
+     	if(face != null){
+     		String card=toCard(mat,face);
+     		System.out.print("身份证号是："+card);
+     	}
+        
+    }
+    public static String toCard(Mat mat,Rect rect){
+    	 Point2d point1=new Point2d(mat.cols()*0.40,mat.rows()*0.75);
+         Point2d point2=new Point2d(mat.cols()*0.40, mat.rows()*0.75);
+         Point2d point3=new Point2d(mat.cols()*0.90, mat.rows()*0.91);
+         Point2d point4=new Point2d(mat.cols()*0.90, mat.rows()*0.91);
+        List<Point2d> list=new ArrayList<>();
+        list.add(point1);
+        list.add(point2);
+        list.add(point3);
+        list.add(point4);
+        Mat card= shear(mat,list);
+        
+        
+       Mat hierarchy = new Mat();
+        MatVector charContours = new MatVector();
+		opencv_imgproc.findContours(card, charContours, hierarchy, opencv_imgproc.RETR_EXTERNAL,
+				opencv_imgproc.CHAIN_APPROX_NONE);
+
+		Vector<Rect> vecRect = new Vector<Rect>();
+
+		for (int k = 0; k < charContours.size(); k++) {
+			Rect mr = opencv_imgproc.boundingRect(charContours.get(k));
+			if (IdCardCvUtils.verifySizes(mr)) {
+				vecRect.add(mr);
+			}
+
+		}
+
+		Vector<Rect> sortedRect = CoreFunc.SortRect(vecRect);
+		int x = 0;
+		StringBuffer idcar = new StringBuffer();
+		for (Rect rectSor : sortedRect) {
+			Mat specMat = new Mat(card, rectSor);
+			specMat = IdCardCvUtils.preprocessChar(specMat);
+			// opencv_imgcodecs.imwrite("temp/debug_specMat" + x + ".jpg",
+			// specMat);
+			opencv_imgcodecs.imwrite("F:/face/debug_specMat" + x + ".jpg", specMat);
+			x++; 
+			/*String charText = svmTrain.svmFind(specMat);
+			idcar.append(charText); */
+			
+		}  
+        
+        //原有的
+        card=OpencvUtil.drawContours(card,50);
+        opencv_imgcodecs.imwrite("F:/face/card.jpg", card);
+        BufferedImage cardBuffer=OpencvUtil.Mat2BufImg(card,".jpg");
+        return OCRUtil.getImageMessage(cardBuffer,"eng",false)+"\n";
+    }
     /**
      * 身份证反面识别
      */
@@ -178,21 +263,21 @@ public class OrcTest {
      * 身份证正面识别
      */
     public static void cardUp (Mat mat) throws  Exception{
+    	
         Mat begin=mat.clone();
         //截取身份证区域，并校正旋转角度
         mat = OpencvUtil.houghLinesP(begin,mat);
+        
         opencv_imgcodecs.imwrite("F:/face/houghLinesP.jpg", mat);
+        
         //循环进行人脸识别,校正图片方向
         Mat face=OpencvUtil.faceLoop(mat);
         opencv_imgcodecs.imwrite("F:/face/face.jpg", face);
         //灰度
-        mat=OpencvUtil.gray(mat);
-        //二值化
-        mat=OpencvUtil.binary(mat);
-        //腐蚀
-        mat=OpencvUtil.erode(mat,1);
+        mat=OpencvUtil.flow(mat);
+        opencv_imgcodecs.imwrite("F:/face/1.jpg", mat);
         //膨胀
-        mat=OpencvUtil.dilate(mat,1); 
+        //mat=OpencvUtil.dilate(mat,1); 
        
         //降噪
      	mat = OpencvUtil.navieRemoveNoise(mat, 1);

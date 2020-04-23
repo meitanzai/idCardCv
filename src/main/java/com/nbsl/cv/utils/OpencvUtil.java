@@ -42,6 +42,17 @@ import org.bytedeco.javacpp.indexer.UByteRawIndexer;
 public class OpencvUtil {
 	private static final int BLACK = 0;
 	private static final int WHITE = 255;
+	
+	public static Mat flow(Mat mat) {
+		// 灰度 
+		mat = OpencvUtil.gray(mat); 
+		// 二值化 此处绝定图片的清晰度 
+		mat = OpencvUtil.binary(mat);  
+		// 腐蚀  去除背景图片
+		mat = OpencvUtil.erode(mat, 1);   
+		
+		return mat;
+	}
 
 	/**
 	 * 灰化处理
@@ -53,16 +64,38 @@ public class OpencvUtil {
 		opencv_imgproc.cvtColor(mat, gray, opencv_imgproc.COLOR_BGR2GRAY, 1);
 		return gray;
 	}
-
+	/**
+	 * 增强对比
+	 * @param mat
+	 * @return
+	 */
+	public static Mat splitBGR(Mat mat) { 
+		MatVector splitBGR = new MatVector();
+		opencv_core.split(mat, splitBGR);
+		for (int i = 0; i<mat.channels(); i++){
+			opencv_imgproc.equalizeHist(splitBGR.get(i), splitBGR.get(i));
+		}  
+		opencv_core.merge(splitBGR, mat);  
+		return mat;
+	}
+	
 	/**
 	 * 二值化处理
-	 *
+	 *参数1：InputArray类型的src，输入图像，填单通道，单8位浮点类型Mat即可。
+	参数2：函数运算后的结果存放在这。即为输出图像（与输入图像同样的尺寸和类型）。
+	参数3：预设满足条件的最大值。
+	参数4：指定自适应阈值算法。可选择ADAPTIVE_THRESH_MEAN_C 或 ADAPTIVE_THRESH_GAUSSIAN_C两种。（具体见下面的解释）。
+	参数5：指定阈值类型。可选择THRESH_BINARY或者THRESH_BINARY_INV两种。（即二进制阈值或反二进制阈值）。
+	参数6：表示邻域块大小，用来计算区域阈值，一般选择为3、5、7......等。
+	参数7：参数C表示与算法有关的参数，它是一个从均值或加权均值提取的常数，可以是负数。（具体见下面的解释）。
 	 * @return
 	 */
 	public static Mat binary(Mat mat) {
 		Mat binary = new Mat();
-		opencv_imgproc.adaptiveThreshold(mat, binary, 255, opencv_imgproc.ADAPTIVE_THRESH_MEAN_C,
-				opencv_imgproc.THRESH_BINARY_INV, 25, 10);
+		// 高斯平滑滤波器卷积降噪
+		//opencv_imgproc.GaussianBlur(mat, mat, new Size(3,3), 0);
+		opencv_imgproc.adaptiveThreshold(mat, binary, 255, opencv_imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,
+				opencv_imgproc.THRESH_BINARY_INV, 7, 10); 
 		return binary;
 	}
 
@@ -117,19 +150,41 @@ public class OpencvUtil {
 		// 高斯平滑滤波器卷积降噪
 		opencv_imgproc.GaussianBlur(mat, dst, new Size(3, 3), 0);
 		// 边缘检测
+		//opencv_imgcodecs.imwrite("F:/face/1.jpg", dst);
 		opencv_imgproc.Canny(mat, dst, 50, 150);
+		//opencv_imgcodecs.imwrite("F:/face/2.jpg", dst);
 		return dst;
 	}
 
 	/**
 	 * 轮廓检测
-	 *
+	 *定义轮廓的检索模式，取值如下：
+
+            CV_RETR_EXTERNAL：只检测最外围轮廓，包含在外围轮廓内的内围轮廓被忽略；
+
+            CV_RETR_LIST：检测所有的轮廓，包括内围、外围轮廓，但是检测到的轮廓不建立等级关系，彼此之间独立，没有等级关系，这就意味着这个检索模式下不存在父轮廓或内嵌轮廓，所以hierarchy向量内所有元素的第3、第4个分量都会被置为-1，具体下文会讲到；
+
+            CV_RETR_CCOMP: 检测所有的轮廓，但所有轮廓只建立两个等级关系，外围为顶层，若外围内的内围轮廓还包含了其他的轮廓信息，则内围内的所有轮廓均归属于顶层；
+
+            CV_RETR_TREE: 检测所有轮廓，所有轮廓建立一个等级树结构。外层轮廓包含内层轮廓，内层轮廓还可以继续包含内嵌轮廓。
+
+参数5：定义轮廓的近似方法，取值如下：
+
+            CV_CHAIN_APPROX_NONE：保存物体边界上所有连续的轮廓点到contours向量内；
+
+            CV_CHAIN_APPROX_SIMPLE：仅保存轮廓的拐点信息，把所有轮廓拐点处的点保存入contours向量内，拐点与拐点之间直线段上的信息点不予保留；
+
+            CV_CHAIN_APPROX_TC89_L1：使用teh-Chinl chain 近似算法;
+
+            CV_CHAIN_APPROX_TC89_KCOS：使用teh-Chinl chain 近似算法。
 	 * @param mat
 	 * @return
 	 */
 	public static MatVector findContours(Mat mat) {
 		MatVector contours = new MatVector();
 		Mat hierarchy = new Mat();
+		/*opencv_imgproc.findContours(mat, contours, hierarchy, opencv_imgproc.RETR_LIST,
+				opencv_imgproc.CHAIN_APPROX_SIMPLE);*/
 		opencv_imgproc.findContours(mat, contours, hierarchy, opencv_imgproc.RETR_LIST,
 				opencv_imgproc.CHAIN_APPROX_SIMPLE);
 		return contours;
@@ -208,80 +263,103 @@ public class OpencvUtil {
 	}
 
 	/**
+	 * 循环进行人脸识别
+	 */
+	public static Rect faceLocation(Mat src) throws Exception {
+		RectVector face = new RectVector();
+		// 默认人脸识别失败时图像旋转90度
+		int k = 90;
+		/*while (k > 0) {*/
+			for (int i = 0; i < 360 / k; i++) {
+				// 人脸识别
+				face = OpencvUtil.face(src);
+				if (face == null) {
+					src = rotate3(src, k);
+				} else { 
+					break;
+				}
+			}
+			/*if (face != null) { 
+				break;
+			} else {
+				k = k - 30;
+			}*/
+		/*}*/ 
+		//opencv_imgproc.resize(testImage, testImage,new Size(Common.faceWidth, Common.faceHeight));
+		return (face !=null && face.get() != null) ? face.get()[0] : null; 
+	}
+	/**
 	 * 剪切身份证区域
-	 *
+	 * 1、旋转身份证水平
+	 * 2、找到四点坐标
+	 * 3、裁剪身份证区域
 	 * @param mat
 	 */
 	public static Mat houghLinesP(Mat begin, Mat mat) {
+		
 		// 灰度 
 		mat = OpencvUtil.gray(mat); 
-		// 二值化
-		mat = OpencvUtil.binary(mat); 
+		// 二值化 此处绝定图片的清晰度 
+		opencv_imgproc.adaptiveThreshold(mat, mat, 255, opencv_imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,
+				opencv_imgproc.THRESH_BINARY_INV, 25, 10);  
 		// 腐蚀  去除背景图片
-		mat = OpencvUtil.erode(mat, 2);   
+		mat = OpencvUtil.erode(mat, 1);  
 		// 边缘检测
-		mat = OpencvUtil.carry(mat);
-		opencv_imgcodecs.imwrite("F:/face/22.jpg", mat);
-		// 降噪
-		mat = OpencvUtil.navieRemoveNoise(mat, 1);
-		opencv_imgcodecs.imwrite("F:/face/11.jpg", mat);
-		// 膨胀
-		mat = OpencvUtil.dilate(mat, 3); 
+		mat = OpencvUtil.carry(mat); 
 		
-		// 轮廓检测,清除小的轮廓部分
+		//mat = splitBGR(mat); 
+		// 膨胀
+		mat = OpencvUtil.dilate(mat, 3);   
+		// 轮廓检测,清除小的轮廓部分 
 		MatVector contours = OpencvUtil.findContours(mat);
+		//Mat newMat = new Mat(mat.size(),opencv_core.CV_8U,new Scalar(255,0));
 		for (int i = 0; i < contours.size(); i++) {
-			double area = OpencvUtil.area(contours.get(i));
-			if (area < 5000) {
+			double area = OpencvUtil.area(contours.get(i)); 
+			if (area > 100 &&  area < 5000) {
 				opencv_imgproc.drawContours(mat, contours, i, new Scalar(0, 0));
+				//opencv_imgproc.drawContours(newMat, contours, i,new Scalar(0,0));
 			}
-		} 
+		}  
+		//opencv_imgcodecs.imwrite("F:/face/22.jpg", newMat);
 		Mat storage = new Mat();
+		//该函数也是实现直线检测的，采用累计概率霍夫变换（PPHT）来找出二值图像中的直线。
 		opencv_imgproc.HoughLinesP(mat, storage, 1, Math.PI / 180, 10, 0, 10);  
 		int[] maxLine = new int[] { 0, 0, 0, 0 };
+		double oldLength = 0; 
 		IntRawIndexer storeIndex = storage.createIndexer();
-		// 获取最长的直线 
-		
+		// 获取最长的直线  
 		for (int x = 0; x < storage.rows(); x++) {
 			int[] vec = new int[4]; 
 			storeIndex.get(x, vec); 
 			double x1 = vec[0], y1 = vec[1], x2 = vec[2], y2 = vec[3];
-			double newLength = Math.sqrt(Math.abs((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)));
-			double oldLength = Math.sqrt(Math.abs((maxLine[0] - maxLine[2]) * (maxLine[0] - maxLine[2])
-					+ (maxLine[1] - maxLine[3]) * (maxLine[1] - maxLine[3])));
-			System.out.println(newLength + "="+oldLength);
+			double newLength = Math.abs((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)); 
 			if (newLength > oldLength) {
+				oldLength  = newLength;
 				maxLine = vec;
 			}
-		}
-		for(int max : maxLine){
-			System.out.println(max);
-		}
-		// 计算最长线的角度
+		} 
+		// 计算最长线的角度 最长直线于水平线的角度 有夹角就旋转
 		double angle = getAngle(maxLine[0], maxLine[1], maxLine[2], maxLine[3]);
-		// 旋转角度
+		// 旋转角度  
 		mat = rotate3(mat, angle);
-		begin = rotate3(begin, angle);
-
+		begin = rotate3(begin, angle); 
 		opencv_imgproc.HoughLinesP(mat, storage, 1, Math.PI / 180, 10, 10, 10);
 		List<int[]> lines = new ArrayList<>();
 		IntRawIndexer storeIndex1 = storage.createIndexer();
-		// 在mat上划线
+		// 在mat上划线  
 		for (int x = 0; x < storage.rows(); x++) { 
 			int[] vec = new int[4];
 			storeIndex1.get(x, vec);
-			int x1 = vec[0], y1 = vec[1], x2 = vec[2], y2 = vec[3];
-			Point start = new Point(x1, y1);
-			Point end = new Point(x2,y2);
+			int x1 = vec[0], y1 = vec[1], x2 = vec[2], y2 = vec[3]; 
 			// 获取与图像x边缘近似平行的直线
-			if (Math.abs(start.y() - end.y()) < 5) {
-				if (Math.abs(x2 - x1) > 20) {
+			if (Math.abs(y2 - y1) < 5) {
+				if (Math.abs(x2 - x1) > 10) {
 					lines.add(vec);
 				}
 			}
 			// 获取与图像y边缘近似平行的直线
-			if (Math.abs(start.x() - end.x()) < 5) {
-				if (Math.abs(y2 - y1) > 20) {
+			if (Math.abs(x2 - x1) < 5) {
+				if (Math.abs(y2 - y1) > 10) {
 					lines.add(vec);
 				}
 			}
@@ -291,6 +369,7 @@ public class OpencvUtil {
 		for (int i = 0; i < lines.size(); i++) {
 			int[] vec = lines.get(i);
 			int x1 = vec[0], y1 = vec[1], x2 = vec[2], y2 = vec[3];
+			
 			maxX = maxX > x1 ? maxX : x1;
 			maxX = maxX > x2 ? maxX : x2;
 			minX = minX > x1 ? x1 : minX;
@@ -299,13 +378,14 @@ public class OpencvUtil {
 			maxY = maxY > y2 ? maxY : y2;
 			minY = minY > y1 ? y1 : minY;
 			minY = minY > y2 ? y2 : minY;
-		} 
+		}  
+		//决定图片的截取范围
 		if (maxX < mat.cols() && minX > 0 && maxY < mat.rows() && minY > 0) {
 			List<Point2d> list = new ArrayList<>();
-			Point2d point1 = new Point2d(minX + 10, minY + 10);
-			Point2d point2 = new Point2d(minX + 10, maxY - 10);
-			Point2d point3 = new Point2d(maxX - 10, minY + 10);
-			Point2d point4 = new Point2d(maxX - 10, maxY - 10);
+			Point2d point1 = new Point2d(minX, minY);
+			Point2d point2 = new Point2d(minX, maxY);
+			Point2d point3 = new Point2d(maxX, minY);
+			Point2d point4 = new Point2d(maxX, maxY);
 			list.add(point1);
 			list.add(point2);
 			list.add(point3);
@@ -314,7 +394,7 @@ public class OpencvUtil {
 		} else {
 			mat = begin;
 		}  
-		opencv_imgcodecs.imwrite("F:/face/houghLinesP1.jpg", mat);
+		//opencv_imgcodecs.imwrite("F:/face/houghLinesP1.jpg", mat);
 		return mat;
 	}
 
@@ -424,13 +504,13 @@ public class OpencvUtil {
 		Point2f pt = new Point2f(splitImage.cols() / 2, splitImage.rows() / 2);
 		// 获取仿射变换矩阵
 		Mat affineTrans = opencv_imgproc.getRotationMatrix2D(pt, angle, 1.0);
-		final DoubleIndexer bgrIdx = affineTrans.createIndexer();
+		/*final DoubleIndexer bgrIdx = affineTrans.createIndexer();
 
 		// System.out.println(affineTrans.dump());
 		// 改变变换矩阵第三列的值
 		bgrIdx.put(0, 2, bgrIdx.get(0, 2) + (wdst - wsrc) / 2);
-		bgrIdx.put(1, 2, bgrIdx.get(1, 2) + (hdst - hsrc) / 2);
-
+		bgrIdx.put(1, 2, bgrIdx.get(1, 2) + (hdst - hsrc) / 2); */
+		
 		opencv_imgproc.warpAffine(splitImage, imgDst, affineTrans, imgDst.size());
 		return imgDst;
 	}

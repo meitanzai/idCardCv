@@ -33,12 +33,15 @@ public class IdCardCvUtils {
 
 	public static void main(String[] args) throws Exception {
 
-		String text = IdCardCvUtils.getIdCardCode(ResourceUtils.getFile("classpath:test/xx2.jpg").getAbsolutePath());
+		String text = IdCardCvUtils.getIdCardCode(ResourceUtils.getFile("classpath:test/5.jpg").getAbsolutePath());
 		System.out.println(text);
 	}
 
 	public static String getIdCardCode(String imagePath) throws IOException {  
 		Mat rgbMat = opencv_imgcodecs.imread(imagePath); // 原图
+		//截取身份证区域，并校正旋转角度
+		Mat begin=rgbMat.clone();
+		rgbMat = OpencvUtil.houghLinesP(begin,rgbMat);
 		Rect rect = detectTextArea(rgbMat);
 		String text = getCharText(rgbMat, rect);
 		return text;
@@ -187,7 +190,7 @@ public class IdCardCvUtils {
 	 * @param in
 	 * @return
 	 */
-	private static Mat preprocessChar(Mat in) {
+	public static Mat preprocessChar(Mat in) {
 		int h = in.rows();
 		int w = in.cols();
 		int charSize = 20;
@@ -208,7 +211,7 @@ public class IdCardCvUtils {
 		return out;
 	}
 
-	private static boolean verifySizes(Rect mr) {
+	public static boolean verifySizes(Rect mr) {
 		if (mr.size().height() < 5 || mr.size().width() < 5) {
 			return false;
 		}

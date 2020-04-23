@@ -20,9 +20,9 @@ public class OCRUtil {
         try{
             ITesseract instance = new Tesseract();
             File tessDataFolder = LoadLibs.extractTessResources("tessdata");
-            if(hasLanguage){
+           /* if(hasLanguage){
             	 instance.setLanguage(language);
-            } 
+            } */
             instance.setDatapath(tessDataFolder.getAbsolutePath()); 
             instance.setTessVariable("digits", "0123456789X");
             instance.setTessVariable("user_defined_dpi", "300");
