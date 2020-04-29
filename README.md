@@ -1,6 +1,8 @@
 # 项目介绍
 本项目是从https://gitee.com/nbsl/idCardCv fork过来的,修改原有的需要安装opencv的过程，全部使用javacv技术重构，不需要
 安装openCV,通过javacv引入需要的jar进行开发。
+新增的了前端控制识别区域的功能，新增了后端识别后验证 
+![前端效果页面](https://gitee.com/endlesshh/idCardCv/blob/master/img/1.jpg)
 
 
 
