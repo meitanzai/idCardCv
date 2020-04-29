@@ -20,11 +20,9 @@ import com.nbsl.cv.utils.CoreFunc;
 import com.nbsl.cv.utils.OCRUtil;
 import com.nbsl.cv.utils.OpencvUtil;
 
-import net.sourceforge.tess4j.util.ImageHelper;
-
 public class IdCardCvUtils {
 
-	public static CHAR_SVM svmTrain;
+	public static CHAR_SVM svmTrain;	
 	//训练后的向量文件
 	public static String svmXml;
 	//临时文件保存路径
@@ -137,7 +135,7 @@ public class IdCardCvUtils {
 		Rect rect = null;
 		for (int step = 20; step < 60;) {
 			// System.out.println(step);
-			Mat element = opencv_imgproc.getStructuringElement(opencv_imgproc.MORPH_RECT, new Size(step, 1));
+			Mat element = opencv_imgproc.getStructuringElement(opencv_imgproc.MORPH_RECT, new Size(step, 3));
 			opencv_imgproc.morphologyEx(grayMat, grayMat, opencv_imgproc.MORPH_CLOSE, element);
 
 			// opencv_imgcodecs.imwrite("temp/MORPH_CLOSE.jpg", grayMat);

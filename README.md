@@ -2,6 +2,8 @@
 本项目是从https://gitee.com/nbsl/idCardCv fork过来的,修改原有的需要安装opencv的过程，全部使用javacv技术重构，不需要
 安装openCV,通过javacv引入需要的jar进行开发。
 
+
+
 # 身份证图像识别
 idCard是一个开源的身份证识别系统，其目标是成为一个简单、高效、准确的非限制场景(unconstrained situation)下的身份证识别库。
 
