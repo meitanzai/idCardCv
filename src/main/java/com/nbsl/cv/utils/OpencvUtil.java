@@ -696,13 +696,12 @@ public class OpencvUtil {
 		opencv_imgcodecs.imencode(fileExtension, matrix, mob);
 		byte[] byteArray = mob.getStringBytes();
 		BufferedImage bufImage = null;
-		try {
-			InputStream in = new ByteArrayInputStream(byteArray);
+		try(InputStream in = new ByteArrayInputStream(byteArray);){ 
 			bufImage = ImageIO.read(in);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return replaceWithWhiteColor(bufImage);
+		return bufImage;
 	}
 
 	public static BufferedImage replaceWithWhiteColor(BufferedImage bi) {

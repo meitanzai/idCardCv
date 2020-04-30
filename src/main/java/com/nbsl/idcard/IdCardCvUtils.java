@@ -1,6 +1,7 @@
 package com.nbsl.idcard;
 
 import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -34,7 +35,22 @@ public class IdCardCvUtils {
 		String text = IdCardCvUtils.getIdCardCode(ResourceUtils.getFile("classpath:test/5.jpg").getAbsolutePath());
 		System.out.println(text);
 	}
+	/**
+	 * 选择指定颜色
+	 * @throws FileNotFoundException
+	 */
+	public static void selectColor() throws FileNotFoundException {
+		Mat img = opencv_imgcodecs.imread(ResourceUtils.getFile("classpath:test/5.jpg").getAbsolutePath()); 
+		Mat imgHSV = new Mat(img.size(), img.type()); 
+		// RGB->HSV
+		opencv_imgproc.cvtColor(img, imgHSV, opencv_imgproc.COLOR_BGR2HSV);
+		opencv_imgcodecs.imwrite(saveStepFile + "HSV.jpg", imgHSV);
 
+		Mat mask = new Mat();
+		opencv_core.inRange(imgHSV, new Mat(new Scalar(0, 0, 0, 1)), new Mat(new Scalar(180, 255, 46, 1)), mask);
+		opencv_imgcodecs.imwrite(saveStepFile + "HSV1.jpg", mask);
+	}
+	
 	public static String getIdCardCode(String imagePath) throws IOException {  
 		Mat rgbMat = opencv_imgcodecs.imread(imagePath); // 原图
 		//截取身份证区域，并校正旋转角度
@@ -69,16 +85,7 @@ public class IdCardCvUtils {
 		opencv_imgproc.medianBlur(charsGrayMat, charsGrayMat, 3);
 
 		// opencv_imgcodecs.imwrite("temp/charsMat.jpg", charsGrayMat);
-		opencv_imgcodecs.imwrite(saveStepFile +"charsMat.jpg", charsGrayMat);
-		
-		
-		//使用tess4j进行识别
-		System.out.println("-------------");
-		BufferedImage nameBuffer=OpencvUtil.Mat2BufImg(charsGrayMat,".jpg");
-        String nameStr=OCRUtil.getImageMessage(nameBuffer,"chi_sim",false);
-        nameStr=nameStr.replace("\n","");
-        System.out.println(nameStr);
-        System.out.println("-------------");
+		opencv_imgcodecs.imwrite(saveStepFile +"charsMat.jpg", charsGrayMat);  
 		
 
 		MatVector charContours = new MatVector();

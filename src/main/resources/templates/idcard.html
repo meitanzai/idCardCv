@@ -26,34 +26,28 @@
         }
     </style>
 </head>
-<body class="white-bg" style="padding-left: 30px;">
+<body class="white-bg" style="padding-left: 10px;padding-top: 50px;">
 <header class="mui-bar mui-bar-nav">
 	<h1 class="mui-title">身份证照片</h1> 
 </header>
-<div style="margin: 90px;">
-    <div style="margin-bottom:10px;">
-        <label for="cropper_imgUpload">
-            <span id="choice-btn" class="mui-btn"><i class="mui-icon mui-icon-pengyouquan"></i>拍照</span>
-        </label>
-        <input type="file" id="cropper_imgUpload" name="file" style="display:none" accept="image/*" capture="camera">
-    </div>
+<div style="margin: 10px;"> 
     <div class="layui-row">
-
+		<div style="float:left; z-index:999;position:absolute;">
+            <div id="img-preview" style="height: 100px;width:185px; overflow: hidden;border: 1px dashed black;">
+            </div>
+        </div>
         <div >
          <!-- <div id="readyimg"
                  style="height:384px ;width:290px ;border: 1px dashed black;background-color: rgb(247, 247, 247);">
                 <img id="img" src="" alt="" style="display:none">
             </div> -->
              <div id="readyimg"
-                 style="height:500px ;width:500px ;border: 1px dashed black;background-color: rgb(247, 247, 247);">
+                 style="height:500px;width:493px ;border: 1px dashed black;background-color: rgb(247, 247, 247);">
                 <img id="img" src="" alt="" style="display:none">
             </div> 
         </div>
-        <div style="margin-top: 10px;">
-            <div id="img-preview" style="height: 100px;width:185px; overflow: hidden;border: 1px dashed black;">
-            </div>
-        </div>
-    </div>
+        
+    </div> 
     <div class="layui-hide oper-btn" style="margin-top: 10px;">
 
         <button style="width: 70px;background-color: #22ace6; color: #fff; border: 0;" type="button" class="mui-btn mui-icon mui-icon-arrowleft" cropper-event="rotate" data-option="-2"
@@ -69,21 +63,12 @@
         </button>
 
     </div>
-    <!--<div class="bm-box layui-hide oper-btn" style="margin-top: 20px;">
-        <div class="layui-col-xs9">
-            <button type="button" class="layui-btn layui-icon layui-icon-left" cropper-event="rotate" data-option="-15"
-                    title="Rotate -90 degrees"> 向左旋转
-            </button>
-            <button type="button" class="layui-btn layui-icon layui-icon-right" cropper-event="rotate" data-option="15"
-                    title="Rotate 90 degrees"> 向右旋转
-            </button>
-            <button type="button" class="layui-btn layui-icon layui-icon-refresh" cropper-event="reset"
-                    title="reset-image">重置图片
-            </button>
-            <button type="button" class="layui-btn layui-icon layui-icon-face-smile" id="keep-save" cropper-event="confirmSave">保存修改
-            </button>
-        </div>
-    </div>-->
+     <div style="margin-top: 10px;">
+        <label for="cropper_imgUpload">
+            <span id="choice-btn" class="mui-btn"><i class="mui-icon mui-icon-pengyouquan"></i>拍照</span>
+        </label>
+        <input type="file" id="cropper_imgUpload" name="file" style="display:none" accept="image/*" capture="camera">
+    </div> 
 </div>
 
 <script src="/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
@@ -109,7 +94,7 @@
             , options = {
             aspectRatio: 158 / 100, //控制裁剪框大小
             viewMode: 1,
-            autoCropArea:0.96, //框的靠近边缘的比例
+            autoCropArea:0.99, //框的靠近边缘的比例
             preview: preview,
             dragMode: 'none',
             responsive: false,

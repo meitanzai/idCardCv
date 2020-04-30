@@ -3,7 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>idCardCv</groupId>
 	<artifactId>idCardCv</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1</version>
+	<packaging>jar</packaging>
 	<name>idCard</name>
 	<description>opencv idcard</description>
 	<parent>
@@ -27,6 +28,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-aop</artifactId>
 		</dependency>
+		<dependency>
+ 			<groupId>org.springframework.boot</groupId>
+ 			<artifactId>spring-boot-devtools</artifactId>
+ 			<optional>true</optional>
+ 		</dependency>
 		<!--web -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -111,12 +117,18 @@
 					<artifactId>log4j</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency> 
+		<!-- 图片裁剪压缩 -->
+		<dependency>
+		    <groupId>net.coobird</groupId>
+		    <artifactId>thumbnailator</artifactId>
+		    <version>0.4.11</version>
 		</dependency>
-
+		
 	</dependencies>
 	<build>
 		<plugins>
-		  <plugin>
+			<plugin>
 	           <artifactId>maven-resources-plugin</artifactId>
 	           <executions>
 	               <execution>
@@ -129,20 +141,59 @@
 	                       <outputDirectory>target/classes</outputDirectory>
 	                       <resources>
 	                           <resource>
-	                               <directory>src/main/resources</directory> 
-	                           </resource> 
+	                               <directory>src/main/resources</directory>
+	                               <filtering>true</filtering>
+	                               <excludes>
+									   <exclude>**/*</exclude>
+	                               </excludes>
+	                           </resource>
+	                           <resource>
+	                               <directory>src/main/resources</directory>
+	                               <filtering>false</filtering>
+	                               <includes>
+									   <exclude>**/*</exclude>
+	                               </includes>
+	                           </resource>
 	                       </resources>
 	                   </configuration>
 	               </execution>
 	           </executions>
-	       </plugin>  
+	       </plugin> 
 			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId> 
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<!--false 才能zip格式更新-->
+					<executable>false</executable>
+					<fork>true</fork>
+					<!-- 此处是启动类-->
+					<mainClass>endless.Application</mainClass>
+					<!-- 要zip模式-->
+					<layout>ZIP</layout>
+					<includes>
+						<!-- 第一次打jar包要注释掉,以后要开启
+						<include>
+							<groupId>nothing</groupId>
+							<artifactId>nothing</artifactId>
+						</include>-->
+					</includes>
 				</configuration>
-			</plugin>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin> 
+			 
+			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
 </project>

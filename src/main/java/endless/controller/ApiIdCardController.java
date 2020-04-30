@@ -5,6 +5,7 @@ import java.nio.file.Files;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.bytedeco.javacpp.opencv_imgcodecs;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ import endless.utils.WorkId;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
+import net.coobird.thumbnailator.Thumbnails;
 
 /**
  * <pre>
@@ -39,8 +41,11 @@ public class ApiIdCardController{
     public ExtResult<String> scanCard(HttpServletRequest request,
 			@ApiParam(name = "svg_xml", required = true, value = "svg_xml") @RequestParam(value = "svg_xml",required = true) String svg_xml){
     	try {
-    		File temp = Files.createTempFile(WorkId.sortUID()+"", ".png").toFile();
+    		File temp = Files.createTempFile(WorkId.sortUID()+"", ".png").toFile(); 
     		Base64.decodeToFile(svg_xml.substring(22,svg_xml.length()), temp);
+    		Thumbnails.of(temp).size(290, 384).toFile("F:/face/size.png");
+    		Thumbnails.of(temp).size(290, 384).toFile(temp); 
+    		
     		String code = IdCardCodeUtils.idCard(temp.getAbsolutePath());
     		System.out.println(code);
     		if(IdcardUtil.isValidCard(code)){
