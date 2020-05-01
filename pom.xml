@@ -144,14 +144,14 @@
 	                               <directory>src/main/resources</directory>
 	                               <filtering>true</filtering>
 	                               <excludes>
-									   <exclude>**/*</exclude>
+									   <exclude>**/*.*</exclude>
 	                               </excludes>
 	                           </resource>
 	                           <resource>
 	                               <directory>src/main/resources</directory>
 	                               <filtering>false</filtering>
 	                               <includes>
-									   <exclude>**/*</exclude>
+									   <exclude>**/*.*</exclude>
 	                               </includes>
 	                           </resource>
 	                       </resources>
