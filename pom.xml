@@ -171,11 +171,11 @@
 					<!-- 要zip模式-->
 					<layout>ZIP</layout>
 					<includes>
-						<!-- 第一次打jar包要注释掉,以后要开启-->
+						<!-- 第一次打jar包要注释掉,以后要开启
 						<include>
 							<groupId>nothing</groupId>
 							<artifactId>nothing</artifactId>
-						</include>
+						</include>-->
 					</includes>
 				</configuration>
 				<executions>

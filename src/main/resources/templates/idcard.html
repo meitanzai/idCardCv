@@ -148,7 +148,14 @@
     function shiBie(imgBase){
         console.log(imgBase);
        // layer.msg("开始识别身份证号码");
-        var indx = layer.load();
+        var indx = layer.load(2, { //icon支持传入0-2
+                shade: [0.5, 'gray'], //0.5透明度的灰色背景
+                content: '识别中...',
+                success: function(layero){
+                    layero.find('.layui-layer-content').css('padding-top', '8px').css('width',"150px");
+                }
+            }
+        );
         $.ajax({
         	type: 'POST',
             url:"/api/idCard/scanCard",
