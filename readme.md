@@ -3,8 +3,10 @@
 安装openCV,通过javaccp引入需要的jar进行开发。
 新增的了前端控制识别区域的功能，新增了后端识别后验证 ，页面样式主要适应paid，重新修改了后面的识别过程，用户opencv进行图片优化和区域
 选择，使用tess4j进行数字和x的识别
-![前端效果页面](https://gitee.com/endlesshh/idCardCv/raw/master/img/1.png)
-![前端效果页面](https://gitee.com/endlesshh/idCardCv/raw/master/img/2.png)
+配合样式中的区域在后台裁剪相关区域图片
+/idCardCv/src/main/resources/static/js/plugins/cropper/cropper.css
+![前端效果页面](https://gitee.com/endlesshh/idCardCv/raw/master/img/1.jpg)
+![前端效果页面](https://gitee.com/endlesshh/idCardCv/raw/master/img/2.jpg)
 
 
 # 身份证图像识别

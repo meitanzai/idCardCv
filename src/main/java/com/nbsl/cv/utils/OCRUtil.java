@@ -26,6 +26,7 @@ public class OCRUtil {
             instance.setDatapath(tessDataFolder.getAbsolutePath()); 
             instance.setTessVariable("digits", "0123456789X");
             instance.setTessVariable("user_defined_dpi", "300");
+            instance.setTessVariable("fonts_dir", tessDataFolder.getAbsolutePath()+File.separator+"fonts");
             result = instance.doOCR(img);
             //System.out.println(result);
         }catch(Exception e){

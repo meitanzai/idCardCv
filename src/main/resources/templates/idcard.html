@@ -32,33 +32,37 @@
 </header>
 <div style="margin: 10px;"> 
     <div class="layui-row">
-		<div style="float:left; z-index:999;position:absolute;">
-            <div id="img-preview" style="height: 100px;width:185px; overflow: hidden;border: 1px dashed black;">
-            </div>
+    	<div style="overflow:hidden;height:563px;width:473px;margin: auto;">
+			<div style="float:left; z-index:999;position:absolute;">
+	            <div id="img-preview" style="height: 100px;width:185px; overflow: hidden;border: 1px dashed black;">
+	            </div>
+	        </div>
+	        <div >
+	         <!-- <div id="readyimg"
+	                 style="height:384px ;width:290px ;border: 1px dashed black;background-color: rgb(247, 247, 247);">
+	                <img id="img" src="" alt="" style="display:none">
+	            </div> -->
+	             <div id="readyimg"
+	                 style="float: left;height:560px;width:470px ;border: 1px dashed black;background-color: rgb(247, 247, 247);background:url(/img/bg.jpg);background-size:100% 100%;">
+	                <img id="img" src="" alt="" style="display:none">
+	            </div> 
+	        </div>
         </div>
-        <div >
-         <!-- <div id="readyimg"
-                 style="height:384px ;width:290px ;border: 1px dashed black;background-color: rgb(247, 247, 247);">
-                <img id="img" src="" alt="" style="display:none">
-            </div> -->
-             <div id="readyimg"
-                 style="height:500px;width:493px ;border: 1px dashed black;background-color: rgb(247, 247, 247);background:url(/img/bg.jpg);background-size:100% 100%;">
-                <img id="img" src="" alt="" style="display:none">
-            </div> 
-        </div>
-        
     </div> 
     <div class="layui-hide oper-btn" style="margin-top: 10px;">
 
         <button style="width: 70px;background-color: #22ace6; color: #fff; border: 0;" type="button" class="mui-btn mui-icon mui-icon-arrowleft" cropper-event="rotate" data-option="-2"
                 title="向左旋转"> 左旋
         </button>
+        &nbsp;&nbsp;&nbsp;
         <button style="width: 70px;background-color: #22ace6; color: #fff; border: 0;" type="button" class="mui-btn mui-icon mui-icon-arrowright" cropper-event="rotate" data-option="2"
                 title="向右旋转"> 右旋
         </button>
+        &nbsp;&nbsp;&nbsp;
         <button style="width: 70px;background-color: #22ace6; color: #fff; border: 0;" type="button" class="mui-btn mui-icon mui-icon-reload" cropper-event="reset"
                 title="恢复初始图片">重置
         </button>
+        &nbsp;&nbsp;&nbsp;
         <button style="width: 70px;background-color: #22ace6; color: #fff; border: 0;" type="button" class="mui-btn mui-icon mui-icon-checkmarkempty" id="keep-save" cropper-event="confirmSave">识别
         </button>
 
@@ -94,7 +98,7 @@
             , options = {
             aspectRatio: 158 / 100, //控制裁剪框大小
             viewMode: 1,
-            autoCropArea:0.99, //框的靠近边缘的比例
+            autoCropArea:0.95, //框的靠近边缘的比例
             preview: preview,
             dragMode: 'none',
             responsive: false,

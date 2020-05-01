@@ -21,8 +21,13 @@ import com.nbsl.cv.utils.CoreFunc;
 import com.nbsl.cv.utils.OCRUtil;
 import com.nbsl.cv.utils.OpencvUtil;
 
+import net.coobird.thumbnailator.Thumbnails;
+
 public class IdCardCodeUtils {
+	
+	
 	public static String saveStepFile = "F:/face/";
+	public static boolean isSaveStep = true;
 
 	public static void main(String[] args) throws Exception {
 
@@ -52,71 +57,95 @@ public class IdCardCodeUtils {
 		//2裁剪身份证号码区域图片
 		Mat card = OpencvUtil.shear(mat, list);
 		//3裁剪数字区域
-		Rect rect = detectTextArea(card);
-		if(rect == null){
-			return "";
-		}
-		card = new Mat(card, rect);
-		//4转为bufferImge
-		opencv_imgcodecs.imwrite(saveStepFile + "card.png", card);
+		card = detectTextArea(card);  
+		//5转为bufferImge
+		if(isSaveStep){
+			opencv_imgcodecs.imwrite(saveStepFile + "card.png", card);
+		} 
 		BufferedImage nameBuffer = OpencvUtil.Mat2BufImg(card, ".png");
-		//5使用tess4j识别
+		//6使用tess4j识别
+		if(isSaveStep){
+			Thumbnails.of(nameBuffer).size(nameBuffer.getWidth(), nameBuffer.getHeight()).toFile("F:/face/cardImg.png");
+		}
 		String nameStr = OCRUtil.getImageMessage(nameBuffer, "chi_sim", false);
 		String code = "";
+		System.out.println("识别后："+nameStr);
 		if (StringUtils.isNotBlank(nameStr)) {
 			nameStr = nameStr.replace("\n", "");
 			String codeX = CharMatcher.DIGIT.removeFrom(nameStr);
 			code = CharMatcher.DIGIT.retainFrom(nameStr)
 					+ (StringUtils.isNotBlank(codeX) ? ("X".equalsIgnoreCase(codeX.substring(0, 1)) ? "X" : "") : "");
 		}
-		System.out.println(code);
+		System.out.println("处理后："+code);
 		return code;
 	}
 
-	private static Rect detectTextArea(Mat srcMat) {
-
-		Mat grayMat = new Mat(); // 灰度图 
-		opencv_imgproc.cvtColor(srcMat, grayMat, opencv_imgproc.COLOR_RGB2GRAY);// 灰度化
-		// 高斯模糊 的原理(周边像素的平均值+正态分布的权重
-		opencv_imgproc.GaussianBlur(grayMat, grayMat, new Size(7, 7), 0, 0, opencv_core.BORDER_DEFAULT);
+	private static Mat detectTextArea(Mat src) {
+		
+		Mat srcMat = src.clone(); 
+		Mat grayMat = new Mat(); 
+		//1、图片处理
+		//图片转灰度图
+		opencv_imgproc.cvtColor(srcMat, grayMat, opencv_imgproc.COLOR_RGB2GRAY); 
+		 
+		//为了进行图片选择 
+		/*
+		 * reSrc = OpencvUtil.binary(grayMat);
+		 * opencv_imgproc.medianBlur(grayMat, reSrc, 1);	
+		opencv_imgcodecs.imwrite(saveStepFile + "medianBlur.jpg", reSrc); 
+		opencv_imgproc.adaptiveThreshold(reSrc, reSrc, 255, opencv_imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,
+							// THRESH_BINARY 白底黑字
+				opencv_imgproc.THRESH_BINARY_INV, 3, 10); */
+	 
+		
+		// 高斯模糊 的原理(周边像素的平均值+正态分布的权重)
+		opencv_imgproc.GaussianBlur(grayMat, grayMat, new Size(7, 7), 0, 0, opencv_core.BORDER_DEFAULT); 
 		// 因为边缘部分的像素值是与旁边像素明显有区别的，所以对图片局部求极值，就可以得到整幅图片的边缘信息了
 		grayMat = CoreFunc.Sobel(grayMat);
-		// opencv_imgcodecs.imwrite("temp/Sobel.jpg", grayMat);
-		opencv_imgcodecs.imwrite(saveStepFile + "Sobel.jpg", grayMat);
+		 
+		if(isSaveStep){
+			opencv_imgcodecs.imwrite(saveStepFile + "Sobel.jpg", grayMat);
+		}
+		
 
 		opencv_imgproc.threshold(grayMat, grayMat, 0, 255, opencv_imgproc.THRESH_OTSU + opencv_imgproc.THRESH_BINARY);
 		opencv_imgproc.medianBlur(grayMat, grayMat, 13);
 
-		// opencv_imgcodecs.imwrite("temp/grayMat.jpg", grayMat);
-		opencv_imgcodecs.imwrite(saveStepFile + "grayMat.jpg", grayMat);
-
+		if(isSaveStep){
+			opencv_imgcodecs.imwrite(saveStepFile + "grayMat.jpg", grayMat);
+		}
+		 
 		// 使用闭操作。对图像进行闭操作以后，可以看到车牌区域被连接成一个矩形装的区域。
 		Mat element = opencv_imgproc.getStructuringElement(opencv_imgproc.MORPH_RECT, new Size(5, 3));
 		opencv_imgproc.morphologyEx(grayMat, grayMat, opencv_imgproc.MORPH_CLOSE, element);
-
-		// opencv_imgcodecs.imwrite("temp/MORPH_CLOSE.jpg", grayMat);
-		opencv_imgcodecs.imwrite(saveStepFile + "MORPH_CLOSE.jpg", grayMat);
-
-		/**
-		 * 轮廓提取()
-		 */
+ 
+		
+		if(isSaveStep){
+			opencv_imgcodecs.imwrite(saveStepFile + "MORPH_CLOSE.jpg", grayMat);
+		}
+	 
+		//轮廓提取  
 		MatVector contoursList = new MatVector();
 		Mat hierarchy = new Mat();
 		opencv_imgproc.findContours(grayMat, contoursList, hierarchy, opencv_imgproc.RETR_EXTERNAL,
-				opencv_imgproc.CHAIN_APPROX_SIMPLE);
+				opencv_imgproc.CHAIN_APPROX_SIMPLE); 
 		
 		Rect rect = null;
+		//CvBox2D box = null;
+		
 		int minWidth = grayMat.cols() / 2;
 		for(long i=0,total = contoursList.size();i<total;i++){
 			rect = opencv_imgproc.boundingRect(contoursList.get(i)); 
-			if(rect.width() < minWidth){
+			if(rect.width() < minWidth){ 
 				rect = null;
 				continue;
-			}
+			} 
+			//获取旋转角度
+			/*box = opencv_imgproc.cvMinAreaRect2(opencv_core.cvMat(contoursList.get(i))); */
+			
 			break;
-		}
-				
-				
+		} 
+		
 		if (rect != null) { 
 			int x = rect.x();
 			int y = rect.y();
@@ -126,10 +155,14 @@ public class IdCardCodeUtils {
 			rect.y(tryXy(y,2));
 			rect.width(w + tryValue(grayMat.cols(),x+w,3));
 			rect.height(h + tryValue(grayMat.rows(),y+h,3));
-			opencv_imgcodecs.imwrite(saveStepFile + "rectMat.jpg", new Mat(grayMat, rect));
-			return rect;
+			
+			//根据方块旋转，颜色翻转
+			/*grayMat = OpencvUtil.rotate3(new Mat(reSrc,rect), box.angle());
+			opencv_core.bitwise_not(grayMat,grayMat);*/ 
+		 
+			return new Mat(srcMat,rect);
 		}
-		return rect;
+		return null;
 	} 
 	
 	private static int tryXy(int x,int down){
