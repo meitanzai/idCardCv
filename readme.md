@@ -6,7 +6,7 @@
 /idCardCv/src/main/resources/static/js/plugins/cropper/cropper.css
 ![前端效果页面](https://gitee.com/endlesshh/idCardCv/raw/master/img/1.jpg)
 ![前端效果页面](https://gitee.com/endlesshh/idCardCv/raw/master/img/2.jpg)
-
+![前端效果页面](https://gitee.com/endlesshh/idCardCv/raw/master/img/3.jpg)
 # 遇到问题
 1、java.lang.UnsatisfiedLinkError: C:\Users\Administrator\.javacpp\cache\opencv-3.4.3-1.4.3-windows-x86_64.jar\org\bytedeco\javacpp\windows-x86_64\jniopencv_core.dll: Can't find dependent libraries
  我的问题是因为没有c++运行环境，我在img/vc_redist.x64.exe中添加了64位的运行环境
