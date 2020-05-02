@@ -23,7 +23,9 @@ public class OCRUtil {
            /* if(hasLanguage){
             	 instance.setLanguage(language);
             } */
+            System.out.println(tessDataFolder.getAbsolutePath());
             instance.setDatapath(tessDataFolder.getAbsolutePath()); 
+            
             instance.setTessVariable("digits", "0123456789X");
             instance.setTessVariable("user_defined_dpi", "300");
             instance.setTessVariable("fonts_dir", tessDataFolder.getAbsolutePath()+File.separator+"fonts");
