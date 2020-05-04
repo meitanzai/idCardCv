@@ -124,7 +124,22 @@
 		    <artifactId>thumbnailator</artifactId>
 		    <version>0.4.11</version>
 		</dependency>
-		
+		<!-- jsqlbox -->
+		<dependency>
+		   <groupId>com.github.drinkjava2</groupId>
+		   <artifactId>jsqlbox</artifactId>  
+		   <version>4.0.6.jre8</version> <!-- 或最新版 -->
+		</dependency> 
+		<dependency>
+		    <groupId>org.projectlombok</groupId>
+		    <artifactId>lombok</artifactId>
+		    <scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>ojdbc6</groupId>
+			<artifactId>ojdbc6</artifactId>
+			<version>2.0</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
