@@ -1,6 +1,7 @@
 package endless.utils;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,17 +22,10 @@ import com.nbsl.cv.utils.CoreFunc;
 import com.nbsl.cv.utils.OCRUtil;
 import com.nbsl.cv.utils.OpencvUtil;
 
+import endless.conf.ConfUtil;
 import net.coobird.thumbnailator.Thumbnails;
 
-public class IdCardCodeUtils {
-	
-	
-	public static String saveStepFile = "F:/face/";
-	public static boolean isSaveStep = true;
-
-	public static void main(String[] args) throws Exception {
-
-	}
+public class IdCardCodeUtils {  
 
 	/**
 	 * 身份证号码识别
@@ -58,14 +52,17 @@ public class IdCardCodeUtils {
 		Mat card = OpencvUtil.shear(mat, list);
 		//3裁剪数字区域
 		card = detectTextArea(card);  
+		if(card == null){
+			return "";
+		}
 		//5转为bufferImge
-		if(isSaveStep){
-			opencv_imgcodecs.imwrite(saveStepFile + "card.png", card);
+		if(ConfUtil.show){
+			opencv_imgcodecs.imwrite(ConfUtil.stepLocal + File.separator + "card.png", card);
 		} 
 		BufferedImage nameBuffer = OpencvUtil.Mat2BufImg(card, ".png");
 		//6使用tess4j识别
-		if(isSaveStep){
-			Thumbnails.of(nameBuffer).size(nameBuffer.getWidth(), nameBuffer.getHeight()).toFile("F:/face/cardImg.png");
+		if(ConfUtil.show){
+			Thumbnails.of(nameBuffer).size(nameBuffer.getWidth(), nameBuffer.getHeight()).toFile(ConfUtil.stepLocal + File.separator +"cardImg.png");
 		}
 		String nameStr = OCRUtil.getImageMessage(nameBuffer, "chi_sim", false);
 		String code = "";
@@ -103,16 +100,16 @@ public class IdCardCodeUtils {
 		// 因为边缘部分的像素值是与旁边像素明显有区别的，所以对图片局部求极值，就可以得到整幅图片的边缘信息了
 		grayMat = CoreFunc.Sobel(grayMat);
 		 
-		if(isSaveStep){
-			opencv_imgcodecs.imwrite(saveStepFile + "Sobel.jpg", grayMat);
+		if(ConfUtil.show){
+			opencv_imgcodecs.imwrite(ConfUtil.stepLocal + File.separator + "Sobel.jpg", grayMat);
 		}
 		
 
 		opencv_imgproc.threshold(grayMat, grayMat, 0, 255, opencv_imgproc.THRESH_OTSU + opencv_imgproc.THRESH_BINARY);
 		opencv_imgproc.medianBlur(grayMat, grayMat, 13);
 
-		if(isSaveStep){
-			opencv_imgcodecs.imwrite(saveStepFile + "grayMat.jpg", grayMat);
+		if(ConfUtil.show){
+			opencv_imgcodecs.imwrite(ConfUtil.stepLocal + File.separator + "grayMat.jpg", grayMat);
 		}
 		 
 		// 使用闭操作。对图像进行闭操作以后，可以看到车牌区域被连接成一个矩形装的区域。
@@ -120,8 +117,8 @@ public class IdCardCodeUtils {
 		opencv_imgproc.morphologyEx(grayMat, grayMat, opencv_imgproc.MORPH_CLOSE, element);
  
 		
-		if(isSaveStep){
-			opencv_imgcodecs.imwrite(saveStepFile + "MORPH_CLOSE.jpg", grayMat);
+		if(ConfUtil.show){
+			opencv_imgcodecs.imwrite(ConfUtil.stepLocal + File.separator + "MORPH_CLOSE.jpg", grayMat);
 		}
 	 
 		//轮廓提取  

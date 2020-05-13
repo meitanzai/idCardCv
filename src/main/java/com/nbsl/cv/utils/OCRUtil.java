@@ -22,8 +22,7 @@ public class OCRUtil {
             File tessDataFolder = LoadLibs.extractTessResources("tessdata");
            /* if(hasLanguage){
             	 instance.setLanguage(language);
-            } */
-            System.out.println(tessDataFolder.getAbsolutePath());
+            } */ 
             instance.setDatapath(tessDataFolder.getAbsolutePath()); 
             
             instance.setTessVariable("digits", "0123456789X");

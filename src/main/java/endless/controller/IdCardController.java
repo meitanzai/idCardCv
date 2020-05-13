@@ -20,5 +20,8 @@ public class IdCardController {
         return "idcard";
     }
 
-   
+    @GetMapping("/index1") 
+    String threads(Model model) {
+        return "threads";
+    }
 }

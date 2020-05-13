@@ -36,5 +36,13 @@ spring:
       max-request-size: 100Mb
   devtools:
     restart:
-      enabled: false 
+      enabled: false  
+#身份证识别图片保存路径
+idcard:
+  step:
+    dir: "F:/face"
+    show: "true"
+  temp:
+    dir: "F:/face/1" 
+
  

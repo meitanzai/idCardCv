@@ -2,10 +2,16 @@ package endless.controller;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.tomcat.util.http.fileupload.util.Streams;
+import org.aspectj.util.FileUtil;
 import org.bytedeco.javacpp.opencv_imgcodecs;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,13 +20,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.IdcardUtil;
+import endless.conf.ConfUtil;
 import endless.utils.ExtResult;
 import endless.utils.IdCardCodeUtils;
+import endless.utils.LocalUploadUtils;
+import endless.utils.UploadResult;
 import endless.utils.WorkId;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import net.coobird.thumbnailator.Thumbnails;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * <pre>
@@ -32,9 +44,8 @@ import net.coobird.thumbnailator.Thumbnails;
 @RestController
 @RequestMapping("/api/idCard/")
 @CrossOrigin(origins = "*", maxAge = 3600)
-public class ApiIdCardController{
+public class ApiIdCardController{ 
 	
-	 
 	@PostMapping(value = "scanCard")
     @ApiOperation( value = "扫描身份证号码", httpMethod = "POST",notes="")
     @ApiResponse(code = 200, message = "success", response = ExtResult.class)
@@ -43,7 +54,9 @@ public class ApiIdCardController{
     	try {
     		File temp = Files.createTempFile(WorkId.sortUID()+"", ".png").toFile(); 
     		Base64.decodeToFile(svg_xml.substring(22,svg_xml.length()), temp);
-    		Thumbnails.of(temp).size(290, 384).toFile("F:/face/size.png");
+    		if(ConfUtil.show){
+    			Thumbnails.of(temp).size(290, 384).toFile(ConfUtil.stepLocal+File.separator+"size.png");
+    		} 
     		Thumbnails.of(temp).size(290, 384).toFile(temp); 
     		
     		String code = IdCardCodeUtils.idCard(temp.getAbsolutePath());
@@ -58,4 +71,6 @@ public class ApiIdCardController{
 			return ExtResult.fail_msg("服务出现异常");
 		}
     }
+	
+	 
 }
