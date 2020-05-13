@@ -197,13 +197,14 @@
          }, 
          formData: {
          	guid: GUID //自定义参数，待会儿解释
-         }
+         },
+         headers: {'userName': 'emi', 'token': '123456'} 
     });
     var indx ;
     uploader.on('fileQueued', function(file) {
     	
     });
-    
+ 	 
     uploader.on('uploadSuccess', function(file, response) { 
    		
         $.ajax({
