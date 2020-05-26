@@ -2,16 +2,9 @@ package endless.controller;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.tomcat.util.http.fileupload.util.Streams;
-import org.aspectj.util.FileUtil;
-import org.bytedeco.javacpp.opencv_imgcodecs;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,16 +16,11 @@ import cn.hutool.core.util.IdcardUtil;
 import endless.conf.ConfUtil;
 import endless.utils.ExtResult;
 import endless.utils.IdCardCodeUtils;
-import endless.utils.LocalUploadUtils;
-import endless.utils.UploadResult;
 import endless.utils.WorkId;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import net.coobird.thumbnailator.Thumbnails;
-
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * <pre>

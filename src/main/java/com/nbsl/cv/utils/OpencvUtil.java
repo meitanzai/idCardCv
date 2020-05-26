@@ -15,22 +15,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import org.bytedeco.javacpp.BytePointer;
-import org.bytedeco.javacpp.opencv_core;
-import org.bytedeco.javacpp.opencv_core.Mat;
-import org.bytedeco.javacpp.opencv_core.MatExpr;
-import org.bytedeco.javacpp.opencv_core.MatVector;
-import org.bytedeco.javacpp.opencv_core.Point;
-import org.bytedeco.javacpp.opencv_core.Point2d;
-import org.bytedeco.javacpp.opencv_core.Point2f;
-import org.bytedeco.javacpp.opencv_core.PointVector;
-import org.bytedeco.javacpp.opencv_core.Rect;
-import org.bytedeco.javacpp.opencv_core.RectVector;
-import org.bytedeco.javacpp.opencv_core.RotatedRect;
-import org.bytedeco.javacpp.opencv_core.Scalar;
-import org.bytedeco.javacpp.opencv_core.Size;
-import org.bytedeco.javacpp.opencv_imgcodecs;
-import org.bytedeco.javacpp.opencv_imgproc;
-import org.bytedeco.javacpp.opencv_objdetect.CascadeClassifier;
+
 import org.bytedeco.javacpp.indexer.ByteArrayIndexer;
 import org.bytedeco.javacpp.indexer.ByteIndexer;
 import org.bytedeco.javacpp.indexer.DoubleArrayIndexer;
@@ -38,6 +23,25 @@ import org.bytedeco.javacpp.indexer.DoubleIndexer;
 import org.bytedeco.javacpp.indexer.IntIndexer;
 import org.bytedeco.javacpp.indexer.IntRawIndexer;
 import org.bytedeco.javacpp.indexer.UByteRawIndexer;
+import org.bytedeco.opencv.global.opencv_core;
+import org.bytedeco.opencv.global.opencv_imgcodecs;
+import org.bytedeco.opencv.global.opencv_imgproc;
+import org.bytedeco.opencv.opencv_core.Mat;
+import org.bytedeco.opencv.opencv_core.MatExpr;
+import org.bytedeco.opencv.opencv_core.MatVector;
+import org.bytedeco.opencv.opencv_core.Point;
+import org.bytedeco.opencv.opencv_core.Point2d;
+import org.bytedeco.opencv.opencv_core.Point2f;
+import org.bytedeco.opencv.opencv_core.PointVector;
+import org.bytedeco.opencv.opencv_core.Rect;
+import org.bytedeco.opencv.opencv_core.RectVector;
+import org.bytedeco.opencv.opencv_core.RotatedRect;
+import org.bytedeco.opencv.opencv_core.Scalar;
+import org.bytedeco.opencv.opencv_core.Scalar4i;
+import org.bytedeco.opencv.opencv_core.Size;
+import org.bytedeco.opencv.opencv_imgproc.Vec2fVector;
+import org.bytedeco.opencv.opencv_imgproc.Vec4iVector;
+import org.bytedeco.opencv.opencv_objdetect.CascadeClassifier;
 
 public class OpencvUtil {
 	private static final int BLACK = 0;
@@ -202,7 +206,7 @@ public class OpencvUtil {
 		for (int i = 0; i < cardContours.size(); i++) {
 			double area = OpencvUtil.area(cardContours.get(i));
 			if (area < size) {
-				opencv_imgproc.drawContours(mat, cardContours, i, new opencv_core.Scalar(0, 0));
+				opencv_imgproc.drawContours(mat, cardContours, i, new Scalar(0, 0));
 			}
 		}
 		return mat;
@@ -321,16 +325,16 @@ public class OpencvUtil {
 			}
 		}  
 		//opencv_imgcodecs.imwrite("F:/face/22.jpg", newMat);
-		Mat storage = new Mat();
+		Vec4iVector storage = new Vec4iVector();
 		//该函数也是实现直线检测的，采用累计概率霍夫变换（PPHT）来找出二值图像中的直线。
 		opencv_imgproc.HoughLinesP(mat, storage, 1, Math.PI / 180, 10, 0, 10);  
 		int[] maxLine = new int[] { 0, 0, 0, 0 };
-		double oldLength = 0; 
-		IntRawIndexer storeIndex = storage.createIndexer();
+		double oldLength = 0;  
 		// 获取最长的直线  
-		for (int x = 0; x < storage.rows(); x++) {
+		for (int x = 0; x < storage.size(); x++) {
 			int[] vec = new int[4]; 
-			storeIndex.get(x, vec); 
+			Scalar4i vec1 = storage.get(x);
+			vec1.get(vec);
 			double x1 = vec[0], y1 = vec[1], x2 = vec[2], y2 = vec[3];
 			double newLength = Math.abs((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)); 
 			if (newLength > oldLength) {
@@ -344,12 +348,13 @@ public class OpencvUtil {
 		mat = rotate3(mat, angle);
 		begin = rotate3(begin, angle); 
 		opencv_imgproc.HoughLinesP(mat, storage, 1, Math.PI / 180, 10, 10, 10);
-		List<int[]> lines = new ArrayList<>();
-		IntRawIndexer storeIndex1 = storage.createIndexer();
+		List<int[]> lines = new ArrayList<int[]>();
+		 
 		// 在mat上划线  
-		for (int x = 0; x < storage.rows(); x++) { 
+		for (int x = 0; x < storage.size(); x++) { 
 			int[] vec = new int[4];
-			storeIndex1.get(x, vec);
+			Scalar4i vec1 = storage.get(x);
+			vec1.get(vec);
 			int x1 = vec[0], y1 = vec[1], x2 = vec[2], y2 = vec[3]; 
 			// 获取与图像x边缘近似平行的直线
 			if (Math.abs(y2 - y1) < 5) {
@@ -381,7 +386,7 @@ public class OpencvUtil {
 		}  
 		//决定图片的截取范围
 		if (maxX < mat.cols() && minX > 0 && maxY < mat.rows() && minY > 0) {
-			List<Point2d> list = new ArrayList<>();
+			List<Point2d> list = new ArrayList<Point2d>();
 			Point2d point1 = new Point2d(minX, minY);
 			Point2d point2 = new Point2d(minX, maxY);
 			Point2d point3 = new Point2d(maxX, minY);
@@ -435,13 +440,13 @@ public class OpencvUtil {
 	 * @param mat
 	 */
 	public static Mat houghLines(Mat mat) {
-		Mat storage = new Mat();
+		Vec2fVector storage = new Vec2fVector();
 		opencv_imgproc.HoughLines(mat, storage, 1, Math.PI / 180, 50, 0, 0, 0, 1);
-		for (int x = 0; x < storage.rows(); x++) {
-			DoubleIndexer dst1Idx = storage.row(x).createIndexer();
-
-			double[] vec = new double[4];
-			dst1Idx.get(0, vec);
+		for (int x = 0; x < storage.size(); x++) {
+			Point2f points = storage.get(x);
+			 
+			float[] vec = new float[4];
+			points.get(vec);
 			double rho = vec[0];
 			double theta = vec[1];
 

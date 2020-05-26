@@ -206,7 +206,7 @@
     });
  	 
     uploader.on('uploadSuccess', function(file, response) { 
-   		
+    	
         $.ajax({
         	type: 'POST',
             url:"/api/webupload/mixChunks",

@@ -12,7 +12,8 @@
  我的问题是因为没有c++运行环境，我在img/vc_redist.x64.exe中添加了64位的运行环境
 
 # 身份证号码识别
-
+请求地址
+http://localhost:8080/idCard/index
 它基于openCV这个开源库。这意味着你可以获取全部源代码，并且移植到opencv支持的所有平台。
 它是基于java开发。
 它的识别率较高。图片清晰情况下，号码检测与识别准确率在90%以上。
@@ -23,13 +24,14 @@
 * windows7 64bit
 * jdk1.8.0_45
 * junit 4
-* opencv3.4.3
-* javaccp1.4.3
+* opencv4.3
+* javaccp1.5.3
 * tess4j4.5.1
 * tesseract4.0.0
 
 # 项目更新
 1、先前使用base64进行图片的上传比较缓慢，使用webuploader插件进行分片上传，网速慢的时候可以提升速度，尤其是paid浏览器使用。原页面改为idcard_bak.html。
 2、原项目中有测试图片保存路径，统一更新到配置文档中。
+3、将opencv3.4.3升级到4.3
 
  

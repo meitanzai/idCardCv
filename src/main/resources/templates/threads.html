@@ -47,7 +47,7 @@
         dnd: '#upload-container',
         pick: '#picker',// 内部根据当前运行是创建，可能是input元素，也可能是flash. 这里是div的id
         multiple: true, // 选择多个
-        chunked: true,// 开起分片上传。
+        chunked: false,// 开起分片上传。
         chunkSize: 102400,//每一片的大小 0.1M
         threads: 5, // 上传并发数。允许同时最大上传进程数。
         method: 'POST', // 文件上传方式，POST或者GET。
@@ -76,9 +76,9 @@
     });
 
     uploader.on('uploadSuccess', function(file, response) {
-    	$.post('/api/webupload/mixChunks', { guid: GUID, name: file.name }, function (data) {
+    	/* $.post('/api/webupload/mixChunks', { guid: GUID, name: file.name }, function (data) {
     		 console.log('已上传');
-    	});
+    	}); */
         console.log(file.id+"传输成功");
     });
 
