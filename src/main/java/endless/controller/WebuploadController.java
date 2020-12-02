@@ -134,7 +134,6 @@ public class WebuploadController {
 				FileUtils.deleteDirectory(new File(localPath+File.separator)); 
 				Thumbnails.of(temp).size(290, 384).toFile(temp); 
 				String code = IdCardCodeUtils.idCard(temp.getAbsolutePath());
-				temp.delete();
 	    		System.out.println(code);
 	    		if(IdcardUtil.isValidCard(code)){
 	    			return ExtResult.ok(code);

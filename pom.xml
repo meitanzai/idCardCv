@@ -7,6 +7,12 @@
 	<packaging>jar</packaging>
 	<name>idCard</name>
 	<description>opencv idcard</description>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.6.RELEASE</version> 
+		<relativePath />
+	</parent>
 	<properties>
         <!-- 文件拷贝时的编码 -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,32 +26,6 @@
 
         <java.version>1.8</java.version>
     </properties>
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.6.RELEASE</version>
-		<relativePath />
-	</parent>
-	 <repositories>
-        <repository>
-            <id>public</id>
-            <name>aliyun nexus</name>
-            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>public</id>
-            <name>aliyun nexus</name>
-            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </pluginRepository>
-    </pluginRepositories>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -123,29 +103,28 @@
 			<artifactId>nekohtml</artifactId>
 		</dependency>
 		<!-- 身份证照片识别 -->
-		<!-- opencv识别 -->
-       <dependency>
-           <groupId>org.bytedeco</groupId>
-           <artifactId>javacpp</artifactId>
-           <version>1.5.3</version>
-       </dependency>
-       <dependency>
-           <groupId>org.bytedeco</groupId>
-           <artifactId>javacv</artifactId>
-           <version>1.5.3</version>
-       </dependency>
+		<dependency>
+			<groupId>org.bytedeco</groupId>
+			<artifactId>javacpp</artifactId>
+			<version>1.4.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bytedeco</groupId>
+			<artifactId>javacv</artifactId>
+			<version>1.4.3</version>
+		</dependency>
 
-       <dependency>
-           <groupId>org.bytedeco</groupId>
-           <artifactId>opencv</artifactId>
-           <version>4.3.0-1.5.3</version>
-       </dependency>
+		<dependency>
+			<groupId>org.bytedeco.javacpp-presets</groupId>
+			<artifactId>opencv</artifactId>
+			<version>3.4.3-1.4.3</version>
+		</dependency>
 
-       <dependency>
-           <groupId>org.bytedeco</groupId>
-           <artifactId>opencv-platform</artifactId>
-           <version>4.3.0-1.5.3</version>
-       </dependency>
+		<dependency>
+			<groupId>org.bytedeco.javacpp-presets</groupId>
+			<artifactId>opencv-platform</artifactId>
+			<version>3.4.3-1.4.3</version>
+		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.tess4j</groupId>
 			<artifactId>tess4j</artifactId>
@@ -174,11 +153,11 @@
 		    <artifactId>lombok</artifactId>
 		    <scope>provided</scope>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>ojdbc6</groupId>
 			<artifactId>ojdbc6</artifactId>
 			<version>2.0</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 		    <groupId>cglib</groupId>
 		    <artifactId>cglib</artifactId>
