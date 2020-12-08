@@ -9,7 +9,7 @@
 ![前端效果页面](https://gitee.com/endlesshh/idCardCv/raw/master/img/3.jpg)
 # 遇到问题
 1、java.lang.UnsatisfiedLinkError: C:\Users\Administrator\.javacpp\cache\opencv-3.4.3-1.4.3-windows-x86_64.jar\org\bytedeco\javacpp\windows-x86_64\jniopencv_core.dll: Can't find dependent libraries
- 我的问题是因为没有c++运行环境，我在img/vc_redist.x64.exe中添加了64位的运行环境
+ 我的问题是因为没有c++运行环境，我在doc/vc_redist.x64.exe中添加了64位的运行环境
 
 # 身份证号码识别
 请求地址
@@ -38,22 +38,24 @@ Linux
 
 # 在centso7或者docker-centos7中运行本项目
 
-##1、docker镜像的制作
+## 1、docker镜像的制作
 
-###1、系统镜像参考这篇文章制作
+### 1、系统镜像参考这篇文章制作
 
 本项目镜像是参考这篇文章制作的，使用而来centos+jdk8
 	https://blog.csdn.net/u012887259/article/details/110298464?utm_medium=distribute.pc_relevant.none-task-blog-title-2&spm=1001.2101.3001.4242
 	
-###2、基于上面的镜像，构建SpringBoot服务
+### 2、基于上面的镜像，构建SpringBoot服务
 
-####1、首先将 doc/build.sh Dockerfile restart_service.sh，resources/linux-x86-64/libept.so下的这些文件都放到和打成的jar的同一个目录下面，这些文件都是平级的。
-####2、运行build.sh来构建autotest:v1.0镜像。
-####3、使用restart_service.sh来运行镜像。首次启动报错，在运行一下就启动该镜像。
-####4、使用docker logs -f -t --tail 100  镜像ID 来查看日志信息。
-####5、请求 dockerIp:8080/idCard/index来识别身份证，根据报错信息修改libept.so文件名称，比如我的就需要libept.so.5这个文名，则将libept.so该名称为libept.so.5 ,相应的改动Dockerfile中 ADD libept.so.5 /usr/local/lib/。删除当前镜像，重新创建。
 
-###3、docker构建SpringBoot服务
+#### 1、首先将 doc/build.sh Dockerfile restart_service.sh，resources/linux-x86-64/libept.so下的这些文件都放到和打成的jar的同一个目录下面，这些文件都是平级的。
+#### 2、运行build.sh来构建autotest:v1.0镜像。
+#### 3、使用restart_service.sh来运行镜像。首次启动报错，在运行一下就启动该镜像。
+#### 4、使用docker logs -f -t --tail 100  镜像ID 来查看日志信息。
+#### 5、请求 dockerIp:8080/idCard/index来识别身份证，根据报错信息修改libept.so文件名称，比如我的就需要libept.so.5这个文名，则将libept.so该名称为libept.so.5 ,相应的改动Dockerfile中 ADD libept.so.5 /usr/local/lib/。删除当前镜像，重新创建。
+
+
+### 3、docker构建SpringBoot服务
 ![运行效果](https://gitee.com/endlesshh/idCardCv/raw/master/img/4.png)
 ![运行效果](https://gitee.com/endlesshh/idCardCv/raw/master/img/5.png)
 ![运行效果](https://gitee.com/endlesshh/idCardCv/raw/master/img/6.png)	
