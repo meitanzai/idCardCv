@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.aspectj.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.crypto.SecureUtil;
 import domain.Webuploader;
 import endless.conf.ConfUtil;
+import endless.service.OrcService;
 import endless.utils.ExtResult;
 import endless.utils.IdCardCodeUtils;
 import endless.utils.LocalUploadUtils;
@@ -44,6 +46,9 @@ import net.coobird.thumbnailator.Thumbnails;
 public class WebuploadController {
 
 	public final transient Logger log = LoggerFactory.getLogger(WebuploadController.class);
+	
+	@Autowired
+	OrcService orcService; 
 	
 	/**
 	 * 为每个用户单独创建了一个自己的上传文件的文件夹
@@ -122,7 +127,7 @@ public class WebuploadController {
 		String localPath=  ConfUtil.upLoadTemp +File.separator+ uploader.getGuid();
 		
 		 
-		File temp = Files.createTempFile(WorkId.sortUID()+"", ".png").toFile(); 
+		File temp = Files.createTempFile(WorkId.getId()+"", ".png").toFile(); 
 		
 		try(FileOutputStream destTempfos = new FileOutputStream(temp, true);){ 
 				
@@ -133,13 +138,19 @@ public class WebuploadController {
 				}
 				FileUtils.deleteDirectory(new File(localPath+File.separator)); 
 				Thumbnails.of(temp).size(290, 384).toFile(temp); 
-				String code = IdCardCodeUtils.idCard(temp.getAbsolutePath());
-	    		System.out.println(code);
-	    		if(IdcardUtil.isValidCard(code)){
+				
+				//2.0版
+				String code = orcService.orc(temp.getAbsolutePath());
+				System.out.println(code);
+				return ExtResult.ok(code);
+				
+				//1.0版
+				//String code = IdCardCodeUtils.idCard(temp.getAbsolutePath()); 
+	    		/*if(IdcardUtil.isValidCard(code)){
 	    			return ExtResult.ok(code);
 	    		}else{
 	    			return ExtResult.fail_msg(code+"不是正确的身份证号码，请重新识别");
-	    		}  
+	    		} */ 
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ExtResult.fail_msg("服务出现异常");
@@ -156,7 +167,7 @@ public class WebuploadController {
 		
 		String[] dirNames = FileUtil.listFiles(new File( ConfUtil.upLoadTemp +File.separator+ uploader.getGuid()));
 		for(String dirName : dirNames){
-			File temp = Files.createTempFile(WorkId.sortUID()+"", ".png").toFile();  
+			File temp = Files.createTempFile(WorkId.getId()+"", ".png").toFile();  
 			try(FileOutputStream destTempfos = new FileOutputStream(temp, true);){  
 				String[] fileNames = FileUtil.listFiles(new File(localPath));
 				List<String> sortNames = Stream.of(fileNames).sorted((a, b) -> a.compareTo(b)).collect(Collectors.toList());
@@ -216,7 +227,7 @@ public class WebuploadController {
 		try {   
 			// 判断上传的文件是否被分片
 			if (StringUtils.isBlank(chunk)) {
-				String newName = WorkId.sortUID() +"."+ name.split("\\.")[1];
+				String newName = WorkId.getId() +"."+ name.split("\\.")[1];
 				String localPath=  ConfUtil.upLoadTemp;
 	            UploadResult re = LocalUploadUtils.uploadFile(request,newName,localPath, 10240);
 	            if(re.isSuccess()){
@@ -246,7 +257,7 @@ public class WebuploadController {
 		    		if(hasFiles.length < new Integer(chunks)){  
 		    			return ExtResult.ok();
 		    		} 
-					String newName = WorkId.sortUID() +"."+ name.split("\\.")[1];
+					String newName = WorkId.getId() +"."+ name.split("\\.")[1];
 					File destTempFile = new File( ConfUtil.upLoadTemp,newName);// ??now.getTime()+name大文件是否需要重新命名
 					
 					try(FileOutputStream destTempfos = new FileOutputStream(destTempFile, true);){ 

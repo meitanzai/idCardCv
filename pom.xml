@@ -25,6 +25,7 @@
         <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
 
         <java.version>1.8</java.version>
+        <djl.version>0.11.0</djl.version>
     </properties>
 	<dependencies>
 		<dependency>
@@ -163,6 +164,92 @@
 		    <artifactId>cglib</artifactId>
 		    <version>3.2.5</version>
 		</dependency>
+		
+		<!--djl-->
+       <dependency>
+		    <groupId>net.java.dev.jna</groupId>
+		    <artifactId>jna</artifactId>
+		    <version>5.3.0</version>
+		</dependency>
+       <dependency>
+           <groupId>ai.djl</groupId>
+           <artifactId>api</artifactId>
+           <version>${djl.version}</version>
+       </dependency>
+       <dependency>
+           <groupId>ai.djl</groupId>
+           <artifactId>basicdataset</artifactId>
+           <version>${djl.version}</version>
+       </dependency>
+       <dependency>
+           <groupId>ai.djl</groupId>
+           <artifactId>model-zoo</artifactId>
+           <version>${djl.version}</version>
+       </dependency>
+       <!-- MXNet -->
+       <dependency>
+           <groupId>ai.djl.mxnet</groupId>
+           <artifactId>mxnet-model-zoo</artifactId>
+           <version>${djl.version}</version>
+       </dependency>
+       <dependency>
+           <groupId>ai.djl.mxnet</groupId>
+           <artifactId>mxnet-engine</artifactId>
+           <version>${djl.version}</version>
+       </dependency>
+       <dependency>
+           <!--
+               See https://github.com/deepjavalibrary/djl/blob/master/mxnet/mxnet-engine/README.md for more MXNet library selection options
+           -->
+           <groupId>ai.djl.mxnet</groupId>
+           <artifactId>mxnet-native-auto</artifactId>
+           <version>1.8.0</version>
+           <scope>runtime</scope>
+       </dependency>
+       <!-- Pytorch -->
+       <dependency>
+           <groupId>ai.djl.pytorch</groupId>
+           <artifactId>pytorch-engine</artifactId>
+           <version>${djl.version}</version>
+       </dependency>
+       <dependency>
+           <groupId>ai.djl.pytorch</groupId>
+           <artifactId>pytorch-model-zoo</artifactId>
+           <version>${djl.version}</version>
+       </dependency>
+       <dependency>
+           <!--
+               See https://github.com/deepjavalibrary/djl/blob/master/pytorch/README.md for more PyTorch library selection options
+           -->
+           <groupId>ai.djl.pytorch</groupId>
+           <artifactId>pytorch-native-auto</artifactId>
+           <version>1.8.1</version>
+           <scope>runtime</scope>
+       </dependency>
+       <dependency>
+           <groupId>org.testng</groupId>
+           <artifactId>testng</artifactId>
+           <version>6.8.1</version>
+           <scope>test</scope>
+       </dependency>
+       <dependency>
+           <groupId>ai.djl.paddlepaddle</groupId>
+           <artifactId>paddlepaddle-engine</artifactId>
+           <version>${djl.version}</version>
+       </dependency>
+       <dependency>
+           <groupId>ai.djl.paddlepaddle</groupId>
+           <artifactId>paddlepaddle-model-zoo</artifactId>
+           <version>${djl.version}</version>
+       </dependency>
+       <dependency>
+           <groupId>ai.djl.paddlepaddle</groupId>
+           <artifactId>paddlepaddle-native-auto</artifactId>
+           <version>2.0.2</version>
+           <scope>runtime</scope>
+       </dependency>
+		
+		
 	</dependencies>
 	<build>
 		<plugins>

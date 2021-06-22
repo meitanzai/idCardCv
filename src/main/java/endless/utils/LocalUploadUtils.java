@@ -150,7 +150,7 @@ public class LocalUploadUtils {
     } 
    
     private static String recreateFileName(String ext)throws Exception {
-        return  WorkId.sortUID() + "." + ext;
+        return  WorkId.getId() + "." + ext;
         /*SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
         return df.format(new Date()) + "_" + new Random().nextInt(10000000) + "." + ext;*/
     } 

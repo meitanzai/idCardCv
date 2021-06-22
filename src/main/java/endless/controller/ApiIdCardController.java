@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.tomcat.util.http.fileupload.util.Streams;
 import org.aspectj.util.FileUtil;
 import org.bytedeco.javacpp.opencv_imgcodecs;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.IdcardUtil;
 import endless.conf.ConfUtil;
+import endless.service.OrcService;
 import endless.utils.ExtResult;
 import endless.utils.IdCardCodeUtils;
 import endless.utils.LocalUploadUtils;
@@ -46,13 +48,17 @@ import java.util.stream.Stream;
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class ApiIdCardController{ 
 	
-	@PostMapping(value = "scanCard")
+	
+	@Autowired
+	OrcService orcService; 
+	
+	@PostMapping(value = "scanCard1")
     @ApiOperation( value = "扫描身份证号码", httpMethod = "POST",notes="")
     @ApiResponse(code = 200, message = "success", response = ExtResult.class)
     public ExtResult<String> scanCard(HttpServletRequest request,
 			@ApiParam(name = "svg_xml", required = true, value = "svg_xml") @RequestParam(value = "svg_xml",required = true) String svg_xml){
     	try {
-    		File temp = Files.createTempFile(WorkId.sortUID()+"", ".png").toFile(); 
+    		File temp = Files.createTempFile(WorkId.getId()+"", ".png").toFile(); 
     		Base64.decodeToFile(svg_xml.substring(22,svg_xml.length()), temp);
     		if(ConfUtil.show){
     			Thumbnails.of(temp).size(290, 384).toFile(ConfUtil.stepLocal+File.separator+"size.png");
@@ -71,6 +77,26 @@ public class ApiIdCardController{
 			return ExtResult.fail_msg("服务出现异常");
 		}
     }
+	
+	@PostMapping(value = "scanCard")
+	@ApiOperation( value = "扫描身份证号码", httpMethod = "POST",notes="")
+	@ApiResponse(code = 200, message = "success", response = ExtResult.class)
+	public ExtResult<String> orc(HttpServletRequest request,
+			@ApiParam(name = "svg_xml", required = true, value = "svg_xml") @RequestParam(value = "svg_xml",required = true) String svg_xml){
+		try {
+			File temp = Files.createTempFile(WorkId.getId()+"", ".png").toFile(); 
+			Base64.decodeToFile(svg_xml.substring(22,svg_xml.length()), temp);
+			if(ConfUtil.show){
+				Thumbnails.of(temp).size(290, 384).toFile(ConfUtil.stepLocal+File.separator+"size.png");
+			} 
+			Thumbnails.of(temp).size(290, 384).toFile(temp);  
+			return ExtResult.ok(orcService.orc(temp.getAbsolutePath()));
+			  
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ExtResult.fail_msg("服务出现异常");
+		}
+	}
 	
 	 
 }
