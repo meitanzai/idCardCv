@@ -1,13 +1,16 @@
 # 2.0项目介绍
-##1、升级后的版本是使用DJL+PaddleORC进行身份证图片文字的识别（当前识别效果不好，应该是他默认的训练的模型不够精确）
-##2、版本切换在 WebuploadController.mixChunks()方法中进行修改，有注释。
-##3、模型更换
+1、升级后的版本是使用DJL+PaddleORC进行身份证图片文字的识别（当前识别效果不好，应该是他默认的训练的模型不够精确）
+------------
+2、版本切换在 WebuploadController.mixChunks()方法中进行修改，有注释。
+------------
+3、模型更换
+------------
 	1、方法一：到https://github.com/PaddlePaddle/PaddleOCR下载对应的模型替换模型路径
 	2、方法二：安装DJL官网教程下载paddlehub模型保存，这里只有两个模型，没有旋转判断。
 	到https://github.com/PaddlePaddle/PaddleOCR/edit/release/2.1/ppocr/utils/ppocr_keys_v1.txt下载文本字典，
 	重写一下PpWordRecognitionTranslator的prepare方法使其找到ppocr_keys_v1.txt
-##4、当前版本只在wind7上测试并通过，其他型号未测试。
-
+4、当前版本只在wind7上测试并通过，其他型号未测试。
+------------
 
 # 1.0项目介绍
 本项目是通过学习https://gitee.com/nbsl/idCardCv 后整合tess4j,不需要经过训练直接使用的,当然,你也可以进行训练后进行使用。该项目修改原有的需要安装opencv的过程，全部使用javaccp技术重构,通过javaccp引入需要的c++库进行开发。不需要安装opencv
